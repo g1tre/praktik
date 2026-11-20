@@ -1,79 +1,49 @@
+                                                                                  using System.Globalization;
 using System.Text;
 
-namespace Lab02;
+namespace Lab01;
 
-// ЛР №2, вариант 3 «Месяц»:
-// по номеру месяца определяем время года и количество дней.
+// ЛР №1, вариант 3 «Температура»:
+// переводим температуру из градусов Цельсия в Фаренгейты и Кельвины.
 internal class Program
 {
     static void Main()
     {
         Console.OutputEncoding = Encoding.UTF8;
 
-        string[] monthNames =
-        {
-            "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
-            "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
-        };
+        Console.Write("Введите температуру в °C: ");
+        double celsius = ReadDouble();
 
-        Console.Write("Введите номер месяца (1-12): ");
-        if (!int.TryParse(Console.ReadLine(), out int month) || month < 1 || month > 12)
+        // Ниже абсолютного нуля температура не бывает, поэтому сразу проверим
+        if (celsius < -273.15)
         {
-            Console.WriteLine("Нужно ввести целое число от 1 до 12.");
+            Console.WriteLine("Так не бывает: ниже -273,15 °C температуры не существует.");
             return;
         }
 
-        // Время года
-        string season;
-        switch (month)
-        {
-            case 12:
-            case 1:
-            case 2:
-                season = "зима";
-                break;
-            case 3:
-            case 4:
-            case 5:
-                season = "весна";
-                break;
-            case 6:
-            case 7:
-            case 8:
-                season = "лето";
-                break;
-            default: // остаются 9, 10 и 11
-                season = "осень";
-                break;
-        }
+        // Формулы из школьного учебника физики
+        double fahrenheit = celsius * 9.0 / 5.0 + 32;
+        double kelvin = celsius + 273.15;
 
-        // Количество дней
-        int days;
-        switch (month)
-        {
-            case 2:
-                // С февралём всё сложнее: нужно знать, високосный ли год
-                Console.Write("Введите год (нужен для февраля): ");
-                if (!int.TryParse(Console.ReadLine(), out int year) || year < 1 || year > 9999)
-                {
-                    Console.WriteLine("Год должен быть целым числом от 1 до 9999.");
-                    return;
-                }
-                days = DateTime.IsLeapYear(year) ? 29 : 28;
-                break;
-            case 4:
-            case 6:
-            case 9:
-            case 11:
-                days = 30;
-                break;
-            default:
-                days = 31;
-                break;
-        }
+        Console.WriteLine();
+        Console.WriteLine($"{celsius:F2} °C = {fahrenheit:F2} °F");
+        Console.WriteLine($"{celsius:F2} °C = {kelvin:F2} K");
+    }
 
-        // "31 день", но "30 дней" - небольшая забота о русском языке
-        string dayWord = days == 31 ? "день" : "дней";
-        Console.WriteLine($"{monthNames[month - 1]} — {season}, {days} {dayWord}.");
+    // Читает число с клавиатуры. Принимает и запятую, и точку,
+    // а если ввели ерунду - просто спрашивает ещё раз.
+    static double ReadDouble()
+    {
+        while (true)
+        {
+            string text = (Console.ReadLine() ?? "").Trim().Replace(',', '.');
+
+            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double value))
+            {
+                return value;
+            }
+
+            Console.Write("Это не число, попробуйте ещё раз: ");
+        }
     }
 }
