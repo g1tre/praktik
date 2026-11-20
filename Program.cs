@@ -1,49 +1,77 @@
-                                                                                  using System.Globalization;
 using System.Text;
 
-namespace Lab01;
+namespace Lab03;
 
-// ЛР №1, вариант 3 «Температура»:
-// переводим температуру из градусов Цельсия в Фаренгейты и Кельвины.
+// ЛР №3, вариант 3 «Простые числа»:
+// выводим все простые числа от 1 до N.
 internal class Program
 {
     static void Main()
     {
         Console.OutputEncoding = Encoding.UTF8;
 
-        Console.Write("Введите температуру в °C: ");
-        double celsius = ReadDouble();
-
-        // Ниже абсолютного нуля температура не бывает, поэтому сразу проверим
-        if (celsius < -273.15)
+        string answer;
+        do
         {
-            Console.WriteLine("Так не бывает: ниже -273,15 °C температуры не существует.");
-            return;
-        }
-
-        // Формулы из школьного учебника физики
-        double fahrenheit = celsius * 9.0 / 5.0 + 32;
-        double kelvin = celsius + 273.15;
-
-        Console.WriteLine();
-        Console.WriteLine($"{celsius:F2} °C = {fahrenheit:F2} °F");
-        Console.WriteLine($"{celsius:F2} °C = {kelvin:F2} K");
-    }
-
-    // Читает число с клавиатуры. Принимает и запятую, и точку,
-    // а если ввели ерунду - просто спрашивает ещё раз.
-    static double ReadDouble()
-    {
-        while (true)
-        {
-            string text = (Console.ReadLine() ?? "").Trim().Replace(',', '.');
-
-            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double value))
+            Console.Write("Введите N (целое число, не меньше 2): ");
+            if (!int.TryParse(Console.ReadLine(), out int n) || n < 2)
             {
-                return value;
+                Console.WriteLine("Нужно целое число, которое не меньше 2.");
+            }
+            else
+            {
+                PrintPrimes(n);
             }
 
-            Console.Write("Это не число, попробуйте ещё раз: ");
+            Console.Write("Повторить с другим N? (д/н): ");
+            answer = (Console.ReadLine() ?? "").Trim().ToLower();
         }
+        while (answer == "д");
+    }
+
+    static void PrintPrimes(int n)
+    {
+        Console.WriteLine($"Простые числа от 1 до {n}:");
+
+        int count = 0;
+
+        // 1 простым не считается, поэтому начинаем с двойки
+        for (int number = 2; number <= n; number++)
+        {
+            bool isPrime = true;
+
+            // Достаточно искать делители до корня из числа.
+            // Умножаем в long, чтобы не переполнить int на больших N.
+            for (int d = 2; (long)d * d <= number; d++)
+            {
+                if (number % d == 0)
+                {
+                    isPrime = false;
+                    break; // нашли делитель - дальше проверять нет смысла
+                }
+            }
+
+            if (!isPrime)
+            {
+                continue;
+            }
+
+            Console.Write(number + " ");
+            count++;
+
+            // Чтобы длинный список не уезжал за край экрана,
+            // переносим строку после каждого десятого числа
+            if (count % 10 == 0)
+            {
+                Console.WriteLine();
+            }
+        }
+
+        if (count % 10 != 0)
+        {
+            Console.WriteLine();
+        }
+
+        Console.WriteLine($"Всего найдено: {count}");
     }
 }
